@@ -47,12 +47,11 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        initPlaylists(); // VIEW
         resolvePermissions();
     }
 
-    // Iterate through playlists, and make a tab for each of them.
-    private void initPlaylists() {
+    // Iterate through playlists, and make a tab for each of them. (VIEW)
+    private void initPlaylistView() {
         ViewPager viewPager = findViewById(R.id.pager_SongList);
         TabLayout tabLayout = findViewById(R.id.tabs_Playlist);
 
@@ -72,7 +71,7 @@ public class MainActivity extends AppCompatActivity {
 
 
     // Get all Music Files from device storage (MODEL)
-    public static ArrayList<AudioFile> getAudioFiles(Context context) {
+    public ArrayList<AudioFile> getAudioFiles(Context context) {
         ArrayList<AudioFile> tempAudioList = new ArrayList<>();
         System.out.println(" getAudioFiles || Checking Device for Music Files...");
 
@@ -86,13 +85,12 @@ public class MainActivity extends AppCompatActivity {
                 MediaStore.Audio.Media.ARTIST
         };
 
-        Cursor cursor = context.getContentResolver().query(uri, null, null, null, null);
+        Cursor cursor = context.getContentResolver().query(uri, projection, null, null, null);
 
         System.out.println(" getAudioFiles || Created cursor " + cursor);
         if (cursor != null && cursor.moveToFirst()) {
 
-            System.out.println(" getAudioFiles || cursor.MoveToNext() is " + cursor.moveToNext());
-            while (cursor.moveToNext()) {
+            do {
                 String album = cursor.getString(0);
                 String title = cursor.getString(1);
                 String duration = cursor.getString(2);
@@ -100,12 +98,14 @@ public class MainActivity extends AppCompatActivity {
                 String artist = cursor.getString(4);
 
                 AudioFile musicFile = new AudioFile(path, title, artist, album, duration);
-                System.out.println("getAllAudio || SONG " + path + " +++ " + title);
-//                tempAudioList.add(musicFile);
-            }
+                System.out.println("getAudioFiles || SONG " + path + " | " + title);
+                tempAudioList.add(musicFile);
+            } while (cursor.moveToNext());
+
+            System.out.println("getAudioFiles || Read Complete. Closing Cursor...");
             cursor.close();
         } else {
-            System.out.println("getAllAudio || NO SONGS FOUND");
+            System.out.println("getAudioFiles || NO SONGS FOUND");
         }
 
         return tempAudioList;
@@ -118,6 +118,7 @@ public class MainActivity extends AppCompatActivity {
         } else {
             Toast.makeText(this, "Media Permissions Granted !", Toast.LENGTH_SHORT).show();
             songsOnDevice = getAudioFiles(this);
+            initPlaylistView(); // VIEW
         }
     }
 
@@ -130,6 +131,7 @@ public class MainActivity extends AppCompatActivity {
                 // Handle permission
                 Toast.makeText(this, "Media Permissions Granted !", Toast.LENGTH_SHORT).show();
                 songsOnDevice = getAudioFiles(this);
+                initPlaylistView(); // VIEW
             } else {
                 ActivityCompat.requestPermissions(MainActivity.this, new String[] { Manifest.permission.WRITE_EXTERNAL_STORAGE }, REQUEST_CODE);
             }

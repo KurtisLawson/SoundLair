@@ -12,20 +12,22 @@ import com.example.soundlair.R;
 
 /**
  * A simple {@link Fragment} subclass.
- * Use the {@link PlaylistFragment#newInstance} factory method to
+ * Use the {@link AudioFileFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class PlaylistFragment extends Fragment {
+public class AudioFileFragment extends Fragment {
 
-    public PlaylistFragment() {
+    
+    public AudioFileFragment() {
         // Required empty public constructor
     }
+
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View view = inflater.inflate(R.layout.fragment_playlist, container, false);
+        View view = inflater.inflate(R.layout.fragment_song, container, false);
         return view;
     }
 }
