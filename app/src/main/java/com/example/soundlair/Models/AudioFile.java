@@ -1,14 +1,14 @@
 package com.example.soundlair.Models;
 
 // This class is used to represent a music file retrieved from the device.
-public class MusicFile {
+public class AudioFile {
     private String path;
     private String title;
     private String artist;
     private String album;
     private String duration;
 
-    public MusicFile(String path, String title, String artist, String album, String duration) {
+    public AudioFile(String path, String title, String artist, String album, String duration) {
         this.path = path;
         this.title = title;
         this.artist = artist;
@@ -16,7 +16,7 @@ public class MusicFile {
         this.duration = duration;
     }
 
-    public MusicFile(String path) {
+    public AudioFile(String path) {
         this.path = path;
     }
 
