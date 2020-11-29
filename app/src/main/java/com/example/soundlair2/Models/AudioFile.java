@@ -1,4 +1,4 @@
-package com.example.soundlair.Models;
+package com.example.soundlair2.Models;
 
 // This class is used to represent a music file retrieved from the device.
 public class AudioFile {

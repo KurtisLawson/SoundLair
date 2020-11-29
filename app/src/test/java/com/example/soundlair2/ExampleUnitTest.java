@@ -1,4 +1,4 @@
-package com.example.soundlair;
+package com.example.soundlair2;
 
 import org.junit.Test;
 
