@@ -38,10 +38,11 @@
 
     <Button
         android:id="@+id/btn_AddToPlaylist"
+        android:onClick="returnSelectedTrack"
         android:layout_width="275dp"
         android:layout_height="57dp"
-        android:layout_marginStart="124dp"
-        android:layout_marginBottom="164dp"
+        android:layout_marginStart="152dp"
+        android:layout_marginBottom="212dp"
         android:background="@color/colorPrimaryDark"
         android:text="Add to Playlist"
         android:textAlignment="center"

@@ -17,6 +17,7 @@ import android.os.Environment;
 import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
+import android.widget.SeekBar;
 import android.widget.Toast;
 
 import com.example.soundlair2.Models.AudioFile;
@@ -60,15 +61,21 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         resolvePermissions();
-//        displayAudioInList();
 
         initPlaylists(); // Model
         getSongsFromCurrentPlaylist(); // Model
 
+        // Presenter
+        updateListViews();
+
     }
 
-    public void displayTracksInActiveTrackList() {
+    public void updateListViews() { // PRESENTER
+        // 1. Track List
         int id = 0;
+        LinearLayout trackLayout = (LinearLayout)findViewById(R.id.layout_TrackList);
+        trackLayout.removeAllViews();
+
         if (currentPlaylist != null) {
             for(Song song : currentPlaylist.getActiveSongs()) {
                 final Button newButton = new Button(this);
@@ -81,10 +88,28 @@ public class MainActivity extends AppCompatActivity {
                     }
                 });
 
-                LinearLayout ll = (LinearLayout)findViewById(R.id.layout_TrackList);
+                trackLayout.addView(newButton);
+                id++;
+            }
+        }
 
-                ll.addView(newButton);
+        // 2. Ambience List
+        id = 0;
+        LinearLayout ambientTracks = (LinearLayout)findViewById(R.id.layout_AmbientTrackList);
+        ambientTracks.removeAllViews();
 
+        if (currentPlaylist != null) {
+            for(Song song : currentPlaylist.getAmbientSongs()) {
+                final SeekBar newVolumeTrack = new SeekBar(this);
+                newVolumeTrack.setId(id);
+
+//                newButton.setOnClickListener(new View.OnClickListener() {
+//                    public void onClick(View v) {
+//                        playTrackAtId(newButton.getId());
+//                    }
+//                });
+
+                ambientTracks.addView(newVolumeTrack);
                 id++;
             }
         }
@@ -127,15 +152,18 @@ public class MainActivity extends AppCompatActivity {
     public void addTrackToCurrentPlaylist(View view) {
         System.out.println("addTrackToCurrentPlaylist || Adding new active track.");
 
-        Intent intent = new Intent(this, TrackBuilderActivity.class);
+        Intent intent = new Intent(getApplicationContext(), TrackBuilderActivity.class);
+        intent.putExtra("REQUEST_CODE", ADD_ACTIVE_TRACK);
         startActivityForResult(intent, ADD_ACTIVE_TRACK);
     }
 
     public void addAmbientTrackToCurrentPlaylist(View view) {
         System.out.println("addAmbientTrackToCurrentPlaylist || Adding new ambient track ");
 
-        Intent intent = new Intent(this, TrackBuilderActivity.class);
+        Intent intent = new Intent(getApplicationContext(), TrackBuilderActivity.class);
+        intent.putExtra("REQUEST_CODE", ADD_AMBIENT_TRACK);
         startActivityForResult(intent, ADD_AMBIENT_TRACK);
+
     }
 
     public void addNewActivePlayList(View view){
@@ -215,12 +243,27 @@ public class MainActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        if (requestCode == ADD_ACTIVE_TRACK && resultCode == RESULT_OK){
-            System.out.println("onActivityResult || Active Track added. ");
-        } else if (requestCode == ADD_AMBIENT_TRACK && resultCode == RESULT_OK) {
-            System.out.println("onActivityResult || Ambient Track added. ");
-            // presenter.RefreshAndDisplay();
+        System.out.println("onActivityResult || Active Track added. ");
+        Bundle extras = data.getExtras();
+        if (resultCode == RESULT_OK && extras != null) {
+            int trackIndex = extras.getInt("AUDIOINDEX");
+
+            if (requestCode == ADD_ACTIVE_TRACK){
+                Song newTrack = new Song(audioFilesOnDevice.get(trackIndex));
+                currentPlaylist.addNewActiveSong(newTrack);
+                System.out.println("onActivityResult || Active Track added. ");
+
+            } else if (requestCode == ADD_AMBIENT_TRACK) {
+
+                Song newAmbience = new Song(audioFilesOnDevice.get(trackIndex));
+                currentPlaylist.addNewAmbientSong(newAmbience);
+                System.out.println("onActivityResult || Ambient Track added. ");
+            }
         }
+
+        updateListViews();
+        // presenter.RefreshAndDisplay();
+
     }
 
     // ======= Permission Code
@@ -253,5 +296,11 @@ public class MainActivity extends AppCompatActivity {
                 ActivityCompat.requestPermissions(MainActivity.this, new String[] { Manifest.permission.WRITE_EXTERNAL_STORAGE }, PERMISSION_REQUEST_CODE);
             }
         }
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        stopCurrentTrack();
     }
 }
