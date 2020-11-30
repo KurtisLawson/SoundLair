@@ -3,13 +3,14 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="wrap_content">
+
     <ScrollView
         android:id="@+id/view_PlaylistView"
-        android:layout_width="839dp"
-        android:layout_height="54dp"
+        android:layout_width="719dp"
+        android:layout_height="60dp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/btn_AddPlaylist"
         app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
@@ -24,45 +25,102 @@
             app:tabMode="scrollable"
             app:tabTextColor="@color/colorAccent">
 
-
-            <com.google.android.material.tabs.TabItem
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Playlist1" />
-
-            <com.google.android.material.tabs.TabItem
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Playlist2" />
-
-            <com.google.android.material.tabs.TabItem
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Playlist3" />
-
         </com.google.android.material.tabs.TabLayout>
     </ScrollView>
 
     <ScrollView
-        android:id="@+id/view_SongList"
-        android:layout_width="291dp"
-        android:layout_height="425dp"
+        android:id="@+id/view_TrackList"
+        android:layout_width="254dp"
+        android:layout_height="409dp"
         android:layout_marginBottom="16dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.911"
+        app:layout_constraintHorizontal_bias="0.919"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/view_PlaylistView"
-        app:layout_constraintVertical_bias="0.481">
+        app:layout_constraintVertical_bias="0.582">
 
         <LinearLayout
-            android:id="@+id/layout_SongList"
+            android:id="@+id/layout_TrackList"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="12dp"
             android:orientation="vertical"></LinearLayout>
     </ScrollView>
 
+    <Button
+        android:id="@+id/btn_AddPlaylist"
+        android:layout_width="78dp"
+        android:layout_height="61dp"
+        android:background="@color/colorPrimaryDark"
+        android:backgroundTint="@color/colorPrimaryDark"
+        android:onClick="addNewActivePlayList"
+        android:text="@string/txt_AddPlaylist"
+        android:textColor="@color/colorAccent"
+        android:textSize="30sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintStart_toStartOf="@+id/view_TrackList"
+        app:layout_constraintTop_toTopOf="@+id/view_PlaylistView" />
+
+    <ScrollView
+        android:id="@+id/view_AmbientTrackList"
+        android:layout_width="137dp"
+        android:layout_height="402dp"
+        android:layout_marginStart="4dp"
+        android:layout_marginBottom="64dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/view_TrackList"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/view_TrackList"
+        app:layout_constraintVertical_bias="0.0">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <SeekBar
+                android:id="@+id/seekBar1"
+                android:layout_width="match_parent"
+                android:layout_height="77dp" />
+
+        </LinearLayout>
+    </ScrollView>
+
+    <Button
+        android:id="@+id/btn_AddActiveTrack"
+        android:onClick="addTrackToCurrentPlaylist"
+        android:layout_width="255dp"
+        android:layout_height="43dp"
+        android:background="@color/colorPrimaryDark"
+        android:text="@string/txt_AddActiveTrack"
+        android:textColor="@color/colorAccent"
+        android:textSize="18sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="@+id/view_TrackList"
+        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintStart_toStartOf="@+id/view_TrackList"
+        app:layout_constraintTop_toBottomOf="@+id/view_TrackList"
+        app:layout_constraintVertical_bias="0.0" />
+
+    <Button
+        android:id="@+id/btn_AddAmbientTrack"
+        android:onClick="addAmbientTrackToCurrentPlaylist"
+        android:layout_width="150dp"
+        android:layout_height="40dp"
+        android:layout_marginTop="8dp"
+        android:background="@color/colorPrimaryDark"
+        android:text="@string/txt_AddAmbientTrack"
+        android:textColor="@color/colorAccent"
+        android:textSize="18sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="@+id/view_AmbientTrackList"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="@+id/view_AmbientTrackList"
+        app:layout_constraintTop_toBottomOf="@+id/view_AmbientTrackList"
+        app:layout_constraintVertical_bias="0.0" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>
