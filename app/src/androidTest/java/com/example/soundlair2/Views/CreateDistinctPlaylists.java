@@ -11,6 +11,7 @@ import androidx.test.rule.ActivityTestRule;
 import androidx.test.rule.GrantPermissionRule;
 import androidx.test.runner.AndroidJUnit4;
 
+import com.example.soundlair2.Presenters.MainActivity;
 import com.example.soundlair2.R;
 
 import org.hamcrest.Description;

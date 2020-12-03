@@ -12,9 +12,9 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme" >
-        <activity android:name=".Views.TrackBuilderActivity" >
+        <activity android:name=".Presenters.TrackBuilderActivity" >
         </activity>
-        <activity android:name=".Views.MainActivity" >
+        <activity android:name=".Presenters.MainActivity" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

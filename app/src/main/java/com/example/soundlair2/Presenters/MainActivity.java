@@ -1,4 +1,4 @@
-package com.example.soundlair2.Views;
+package com.example.soundlair2.Presenters;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -24,16 +24,13 @@ import android.widget.Toast;
 import com.example.soundlair2.Models.AudioFile;
 import com.example.soundlair2.Models.Playlist;
 import com.example.soundlair2.Models.Song;
-import com.example.soundlair2.Presenters.ITrackView;
 import com.example.soundlair2.R;
+import com.example.soundlair2.Views.AmbientSeekBar;
+import com.example.soundlair2.Views.ITrackView;
 import com.google.android.material.tabs.TabLayout;
 
 import java.io.File;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
 
 public class MainActivity extends AppCompatActivity implements ITrackView {
 

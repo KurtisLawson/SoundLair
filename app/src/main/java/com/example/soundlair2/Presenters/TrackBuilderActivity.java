@@ -1,4 +1,4 @@
-package com.example.soundlair2.Views;
+package com.example.soundlair2.Presenters;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -12,14 +12,13 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.example.soundlair2.Models.AudioFile;
-import com.example.soundlair2.Models.Song;
 import com.example.soundlair2.R;
 
 import java.io.File;
 
-import static com.example.soundlair2.Views.MainActivity.ADD_ACTIVE_TRACK;
-import static com.example.soundlair2.Views.MainActivity.ADD_AMBIENT_TRACK;
-import static com.example.soundlair2.Views.MainActivity.audioFilesOnDevice;
+import static com.example.soundlair2.Presenters.MainActivity.ADD_ACTIVE_TRACK;
+import static com.example.soundlair2.Presenters.MainActivity.ADD_AMBIENT_TRACK;
+import static com.example.soundlair2.Presenters.MainActivity.audioFilesOnDevice;
 
 public class TrackBuilderActivity extends AppCompatActivity {
 

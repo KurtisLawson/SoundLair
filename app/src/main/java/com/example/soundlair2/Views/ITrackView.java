@@ -1,4 +1,4 @@
-package com.example.soundlair2.Presenters;
+package com.example.soundlair2.Views;
 
 public interface ITrackView {
     public void updateTrackLists();
