@@ -14,6 +14,7 @@ import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
+import android.view.ContextThemeWrapper;
 import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
@@ -23,6 +24,7 @@ import android.widget.Toast;
 import com.example.soundlair2.Models.AudioFile;
 import com.example.soundlair2.Models.Playlist;
 import com.example.soundlair2.Models.Song;
+import com.example.soundlair2.Presenters.ITrackView;
 import com.example.soundlair2.R;
 import com.google.android.material.tabs.TabLayout;
 
@@ -33,7 +35,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements ITrackView {
 
     public static final int PERMISSION_REQUEST_CODE = 1;
 
@@ -50,10 +52,9 @@ public class MainActivity extends AppCompatActivity {
     Playlist currentPlaylist;
 
     // Media player components
-    int maxVolume = 200;
-    int curVolume = 200;
+    final int maxVolume = 100;
     MediaPlayer activeTrackPlayer;
-    List<MediaPlayer> ambientTrackPlayers;
+    ArrayList<MediaPlayer> ambientTrackPlayers;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,15 +63,17 @@ public class MainActivity extends AppCompatActivity {
 
         resolvePermissions();
 
-        initPlaylists(); // Model
-        getSongsFromCurrentPlaylist(); // Model
+        if (playlists == null) {
+            initPlaylists(); // Model
+        }
 
         // Presenter
-        updateListViews();
+        updateTrackLists();
 
     }
 
-    public void updateListViews() { // PRESENTER
+    @Override
+    public void updateTrackLists() { // PRESENTER
         // 1. Track List
         int id = 0;
         LinearLayout trackLayout = (LinearLayout)findViewById(R.id.layout_TrackList);
@@ -94,22 +97,59 @@ public class MainActivity extends AppCompatActivity {
         }
 
         // 2. Ambience List
-        id = 0;
-        LinearLayout ambientTracks = (LinearLayout)findViewById(R.id.layout_AmbientTrackList);
-        ambientTracks.removeAllViews();
+        LinearLayout ambientTracksLayout = (LinearLayout)findViewById(R.id.layout_AmbientTrackList);
 
+        // Remove all views and turn off all Ambient Media Players
+        ambientTracksLayout.removeAllViews();
+        for (MediaPlayer ambientPlayer : ambientTrackPlayers) {
+            ambientPlayer.stop();
+
+        }
+
+        ambientTrackPlayers = new ArrayList<MediaPlayer>();
+
+        id = 0;
         if (currentPlaylist != null) {
             for(Song song : currentPlaylist.getAmbientSongs()) {
-                final SeekBar newVolumeTrack = new SeekBar(this);
-                newVolumeTrack.setId(id);
 
+                // 1. Create the seekbar
+                final SeekBar newVolumeTrack = new AmbientSeekBar(new ContextThemeWrapper(this,R.style.AmbientSeekBar));;
+                newVolumeTrack.setId(id);
+                newVolumeTrack.setMax(100);
+                newVolumeTrack.setMin(0);
+                ambientTracksLayout.addView(newVolumeTrack);
+
+                newVolumeTrack.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+                    int pval = 0;
+                    @Override
+                    public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+
+                        pval = progress;
+                        setAmbientVolumeAtId(newVolumeTrack.getId(), pval);
+                    }
+                    @Override
+                    public void onStartTrackingTouch(SeekBar seekBar) {
+                        // write custom code to on start progress
+                    }
+                    @Override
+                    public void onStopTrackingTouch(SeekBar seekBar) {
+//                      // write custom code to on stop progress
+                    }
+                });
+
+                // 2. Set up a new media player reference.
+                MediaPlayer newAmbientPlayer = MediaPlayer.create(this, Uri.fromFile(new File(song.getTargetSong().getPath())));
+                newAmbientPlayer.setVolume(0 , 0);
+                newAmbientPlayer.start();
+                ambientTrackPlayers.add(newAmbientPlayer);
+
+//                MediaPlayer newAmbientPlayer =
 //                newButton.setOnClickListener(new View.OnClickListener() {
 //                    public void onClick(View v) {
 //                        playTrackAtId(newButton.getId());
 //                    }
 //                });
 
-                ambientTracks.addView(newVolumeTrack);
                 id++;
             }
         }
@@ -121,9 +161,17 @@ public class MainActivity extends AppCompatActivity {
 
         stopCurrentTrack();
         activeTrackPlayer = MediaPlayer.create(this, Uri.fromFile(new File(targetTrack.getTargetSong().getPath())));
-        float vol = (float)(Math.log(maxVolume-curVolume)/Math.log(maxVolume));
         activeTrackPlayer.start();
+        float vol = (float) (maxVolume / 2) / maxVolume;
         activeTrackPlayer.setVolume(vol , vol); // TODO Adjust volume with slider
+    }
+
+    public void setAmbientVolumeAtId(int id, float volume) {
+
+        MediaPlayer ambientPlayer = ambientTrackPlayers.get(id);
+//        System.out.println("setAmbientVolumeAtId || Volume of " + currentPlaylist.getAmbientSongs().get(id).getTargetSong().getTitle() + " is being changed to " + volume + "/" + (maxVolume));
+        float vol = volume / maxVolume;
+        ambientPlayer.setVolume(vol, vol);
     }
 
     public void stopCurrentTrack() {
@@ -132,20 +180,60 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    public void stopAmbientTracks() {
+        if (ambientTrackPlayers != null) {
+            for (MediaPlayer player : ambientTrackPlayers) {
+                player.stop();
+            }
+        }
+    }
+
     // Iterate through playlists, and make a tab for each of them. (VIEW)
     private void initPlaylists() {
+
+
         if (playlists == null || playlists.size() == 0) {
             playlists = new ArrayList<Playlist>();
 
             addNewActivePlayList(findViewById(android.R.id.content));
-            getSongsFromCurrentPlaylist();
+        }
+
+        if (ambientTrackPlayers == null) {
+            ambientTrackPlayers = new ArrayList<MediaPlayer>();
         }
 
         currentPlaylist = playlists.get(0);
+
+        TabLayout tabLayout = (TabLayout)findViewById(R.id.tabs_Playlist);
+        tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
+            @Override
+            public void onTabSelected(TabLayout.Tab tab) {
+                int tabPos = tab.getPosition();
+
+                if (tabPos >= 0 && tabPos < playlists.size()) {
+                    System.out.println("onTabSelected || Swapping to playlist " + (tabPos + 1));
+                    swapToPlayList(tabPos);
+                }
+            }
+
+            @Override
+            public void onTabUnselected(TabLayout.Tab tab) {
+
+            }
+
+            @Override
+            public void onTabReselected(TabLayout.Tab tab) {
+
+            }
+        });
     }
 
-    private void getSongsFromCurrentPlaylist() {
+    public void swapToPlayList(int id) {
+        stopCurrentTrack();
+        stopAmbientTracks();
 
+        currentPlaylist = playlists.get(id);
+        updateTrackLists();
     }
 
     // Functions to add a track to the list.
@@ -188,13 +276,6 @@ public class MainActivity extends AppCompatActivity {
         System.out.println(" getAudioFiles || Checking Device for Music Files...");
 
         Uri uri = android.provider.MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
-//        String[] projection = {
-//                MediaStore.Audio.Media.ALBUM,
-//                MediaStore.Audio.Media.TITLE,
-//                MediaStore.Audio.Media.DURATION,
-//                MediaStore.Audio.Media.DATA, // Used to get path
-//                MediaStore.Audio.Media.ARTIST
-//        };
 
         String storagePath = Environment.getExternalStorageDirectory().getPath() + "/Music/";
         File storageFile = new File(storagePath);
@@ -244,24 +325,28 @@ public class MainActivity extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
 
         System.out.println("onActivityResult || Active Track added. ");
-        Bundle extras = data.getExtras();
-        if (resultCode == RESULT_OK && extras != null) {
-            int trackIndex = extras.getInt("AUDIOINDEX");
 
-            if (requestCode == ADD_ACTIVE_TRACK){
-                Song newTrack = new Song(audioFilesOnDevice.get(trackIndex));
-                currentPlaylist.addNewActiveSong(newTrack);
-                System.out.println("onActivityResult || Active Track added. ");
+        if (resultCode == RESULT_OK) {
+            Bundle extras = data.getExtras();
 
-            } else if (requestCode == ADD_AMBIENT_TRACK) {
+            if (extras != null) {
+                int trackIndex = extras.getInt("AUDIOINDEX");
 
-                Song newAmbience = new Song(audioFilesOnDevice.get(trackIndex));
-                currentPlaylist.addNewAmbientSong(newAmbience);
-                System.out.println("onActivityResult || Ambient Track added. ");
+                if (requestCode == ADD_ACTIVE_TRACK){
+                    Song newTrack = new Song(audioFilesOnDevice.get(trackIndex));
+                    currentPlaylist.addNewActiveSong(newTrack);
+                    System.out.println("onActivityResult || Active Track added. ");
+
+                } else if (requestCode == ADD_AMBIENT_TRACK) {
+
+                    Song newAmbience = new Song(audioFilesOnDevice.get(trackIndex));
+                    currentPlaylist.addNewAmbientSong(newAmbience);
+                    System.out.println("onActivityResult || Ambient Track added. ");
+                }
             }
         }
 
-        updateListViews();
+        updateTrackLists();
         // presenter.RefreshAndDisplay();
 
     }
@@ -302,5 +387,8 @@ public class MainActivity extends AppCompatActivity {
     protected void onPause() {
         super.onPause();
         stopCurrentTrack();
+        stopAmbientTracks();
     }
+
+
 }

@@ -1,12 +1,15 @@
 <resources>
     <string name="app_name">SoundLair2</string>
+
+    <!-- MAIN ACTIVITY -->
     <string name="txt_AddPlaylist">+</string>
     <string name="txt_AddActiveTrack">+ Track</string>
     <string name="txt_AddAmbientTrack">+ Ambience</string>
-    <string name="title_activity_track_builder">TrackBuilderActivity</string>
-    <!--
-    This string is used for square devices and overridden by hello_world in
-    values-round/strings.xml for round devices.
-    -->
-    <string name="hello_world">Hello Square World!</string>
+
+    <!-- TRACK BUILDER -->
+    <string name="txt_ConfirmAddTrack">Add to Playlist</string>
+    <string name="txt_NewTrack">Add New Track</string>
+    <string name="txt_NewAmbience">Add New Ambience</string>
+<!--    <string name="title_activity_track_builder">TrackBuilderActivity</string>-->
+
 </resources>
