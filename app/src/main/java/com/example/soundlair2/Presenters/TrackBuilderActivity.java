@@ -12,13 +12,13 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.example.soundlair2.Models.AudioFile;
+import com.example.soundlair2.Models.AudioFileManager;
 import com.example.soundlair2.R;
 
 import java.io.File;
 
 import static com.example.soundlair2.Presenters.MainActivity.ADD_ACTIVE_TRACK;
 import static com.example.soundlair2.Presenters.MainActivity.ADD_AMBIENT_TRACK;
-import static com.example.soundlair2.Presenters.MainActivity.audioFilesOnDevice;
 
 public class TrackBuilderActivity extends AppCompatActivity {
 
@@ -42,8 +42,8 @@ public class TrackBuilderActivity extends AppCompatActivity {
 
     private void displayAudioInSongList() {
         int id = 0;
-        if (audioFilesOnDevice != null) {
-            for(AudioFile file : audioFilesOnDevice) {
+        if (AudioFileManager.audioFilesOnDevice != null) {
+            for(AudioFile file : AudioFileManager.audioFilesOnDevice) {
                 final Button newButton = new Button(this);
                 newButton.setText(file.getTitle());
                 newButton.setId(id);
@@ -76,7 +76,7 @@ public class TrackBuilderActivity extends AppCompatActivity {
 
     public void playTrackAtId(int id) {
         songSelected = true;
-        AudioFile targetTrack = audioFilesOnDevice.get(id);
+        AudioFile targetTrack = AudioFileManager.audioFilesOnDevice.get(id);
         System.out.println("playTrackAtId || Playing track " + id + " : " + targetTrack.getPath());
 
         // Start playing the selected Track

@@ -22,6 +22,7 @@ import android.widget.SeekBar;
 import android.widget.Toast;
 
 import com.example.soundlair2.Models.AudioFile;
+import com.example.soundlair2.Models.AudioFileManager;
 import com.example.soundlair2.Models.Playlist;
 import com.example.soundlair2.Models.Song;
 import com.example.soundlair2.R;
@@ -40,7 +41,9 @@ public class MainActivity extends AppCompatActivity implements ITrackView {
     public static final int ADD_AMBIENT_TRACK = 2;
 
     // Storage for the available songs on the device. Used for adding new songs to a Playlist.
-    public static ArrayList<AudioFile> audioFilesOnDevice;
+//    public static ArrayList<AudioFile> audioFilesOnDevice;
+
+    AudioFileManager audioFiles;
 
     // A list of all playlists.
     ArrayList<Playlist> playlists;
@@ -266,56 +269,6 @@ public class MainActivity extends AppCompatActivity implements ITrackView {
 
     }
 
-
-    // Get all Music Files from device storage (MODEL)
-    public ArrayList<AudioFile> getAudioFiles(Context context) {
-        ArrayList<AudioFile> tempAudioList = new ArrayList<AudioFile>();
-        System.out.println(" getAudioFiles || Checking Device for Music Files...");
-
-        Uri uri = android.provider.MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
-
-        String storagePath = Environment.getExternalStorageDirectory().getPath() + "/Music/";
-        File storageFile = new File(storagePath);
-        Uri storageUri = Uri.fromFile(storageFile);
-
-        File[] fileArray = storageFile.listFiles();
-
-        for (int i = 0; i < fileArray.length; ++i) {
-
-            String path = fileArray[i].getAbsolutePath();
-            String title = "";
-            String artist = "";
-            String album = "";
-            String duration = "";
-
-            // Getting the name of the file ex. Temptation.mp3
-            System.out.println(" \n  getAudioFiles || Getting new Audio File...");
-            String fileNameArray[] = path.split("\\/");
-            String fileName = fileNameArray[fileNameArray.length-1];
-
-            // Splitting the file name from the extension ex. Temptation || mp3
-            String fileExtensionArray[] = fileName.split("\\.");
-            title = fileExtensionArray[0];
-
-            if (fileExtensionArray[1].equals("mp3")) {
-                System.out.println(" getAudioFiles || " + title + " Is a valid mp3 file");
-                System.out.println(" getAudioFiles || File Path - " + path);
-                System.out.println(" getAudioFiles || File Title - " + title);
-                System.out.println(" getAudioFiles || File Extension - " + fileExtensionArray[1]);
-
-                // Get the duration of the mp3 file
-                MediaMetadataRetriever meta = new MediaMetadataRetriever();
-                meta.setDataSource(path);
-                duration = meta.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION); // TODO Convert from ms to seconds (if needed)
-
-                AudioFile musicFile = new AudioFile(path, title, artist, album, duration);
-                tempAudioList.add(musicFile);
-            }
-        }
-
-        return tempAudioList;
-    }
-
     // ======= Activity result code
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -330,13 +283,13 @@ public class MainActivity extends AppCompatActivity implements ITrackView {
                 int trackIndex = extras.getInt("AUDIOINDEX");
 
                 if (requestCode == ADD_ACTIVE_TRACK){
-                    Song newTrack = new Song(audioFilesOnDevice.get(trackIndex));
+                    Song newTrack = new Song(audioFiles.audioFilesOnDevice.get(trackIndex));
                     currentPlaylist.addNewActiveSong(newTrack);
                     System.out.println("onActivityResult || Active Track added. ");
 
                 } else if (requestCode == ADD_AMBIENT_TRACK) {
 
-                    Song newAmbience = new Song(audioFilesOnDevice.get(trackIndex));
+                    Song newAmbience = new Song(audioFiles.audioFilesOnDevice.get(trackIndex));
                     currentPlaylist.addNewAmbientSong(newAmbience);
                     System.out.println("onActivityResult || Ambient Track added. ");
                 }
@@ -358,8 +311,9 @@ public class MainActivity extends AppCompatActivity implements ITrackView {
         } else {
             Toast.makeText(this, "Media Permissions Granted !", Toast.LENGTH_SHORT).show();
             System.out.println("resolvePermissions || Successfully resolved Permissions.");
-            audioFilesOnDevice = getAudioFiles(this);
+//            audioFilesOnDevice = getAudioFiles(this);
 
+            audioFiles = new AudioFileManager(this);
         }
     }
 
@@ -372,7 +326,9 @@ public class MainActivity extends AppCompatActivity implements ITrackView {
                 // Handle permission
                 System.out.println("resolvePermissions || Successfully resolved Permissions.");
                 Toast.makeText(this, "Media Permissions Granted !", Toast.LENGTH_SHORT).show();
-                audioFilesOnDevice = getAudioFiles(this);
+//                audioFilesOnDevice = getAudioFiles(this);
+
+                audioFiles = new AudioFileManager(this);
 
             } else {
                 ActivityCompat.requestPermissions(MainActivity.this, new String[] { Manifest.permission.WRITE_EXTERNAL_STORAGE }, PERMISSION_REQUEST_CODE);

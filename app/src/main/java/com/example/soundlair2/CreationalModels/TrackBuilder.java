@@ -21,9 +21,37 @@ public class TrackBuilder {
 
     }
 
+    public TrackBuilder setPath(String path) {
+        this.path = path;
+        return this;
+    }
+
+    public TrackBuilder setTitle(String title) {
+        this.title = title;
+        return this;
+    }
+
+    public TrackBuilder setArtist(String artist) {
+        this.artist = artist;
+        return this;
+    }
+
+    public TrackBuilder setAlbum(String album) {
+        this.album = album;
+        return this;
+    }
+
+    public TrackBuilder setDuration(String duration) {
+        this.duration = duration;
+        return this;
+    }
+
     // Song Builder
     public TrackBuilder setAudioFile(AudioFile file) {
+        // Target file
         this.targetSong = file;
+
+        // File fields
         this.path = targetSong.getPath();
         this.title = targetSong.getTitle();
         this.artist = targetSong.getArtist();
@@ -44,10 +72,15 @@ public class TrackBuilder {
 
     public AudioFile buildAudioFile() {
         if (validateAudioFileParameters()) {
-            return new AudioFile(path, title, artist, album, duration);
+            targetSong = new AudioFile(path, title, artist, album, duration);
+            return targetSong;
         } else {
             throw new IllegalStateException();
         }
+    }
+
+    private boolean validateAudioFileParameters() {
+        return true;
     }
 
     public Song buildSong() {
@@ -59,10 +92,14 @@ public class TrackBuilder {
     }
 
     private boolean validateSongParameters() {
-        return true;
+        boolean valid = false;
+
+        if (targetSong != null){
+            valid = true;
+        }
+
+        return valid;
     }
 
-    private boolean validateAudioFileParameters() {
-        return true;
-    }
+
 }

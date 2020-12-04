@@ -1,7 +1,10 @@
 package com.example.soundlair2.Models;
 
+import java.util.ArrayList;
+
 // This class is used to represent a music file retrieved from the device.
 public class AudioFile {
+
     private String path;
     private String title;
     private String artist;
@@ -60,4 +63,6 @@ public class AudioFile {
     public void setDuration(String duration) {
         this.duration = duration;
     }
+
+
 }
